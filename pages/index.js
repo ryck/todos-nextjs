@@ -1,4 +1,4 @@
-import { useState, useRef } from "react";
+import { useState } from "react";
 import { nanoid } from "nanoid";
 
 export default function Home() {
@@ -12,7 +12,7 @@ export default function Home() {
     {
       id: nanoid(),
       text: "Do the laundry",
-      completed: true,
+      completed: false,
     },
   ];
 
@@ -22,19 +22,20 @@ export default function Home() {
 
   const createTodo = (event) => {
     event.preventDefault();
-    setSavingCount((savingCount) => ++savingCount);
+    if (newTodo.text.length > 0) {
+      setSavingCount((savingCount) => ++savingCount);
+      let id = nanoid();
+      setTodos([
+        ...todos,
+        {
+          ...newTodo,
+          id,
+        },
+      ]);
 
-    let id = nanoid();
-    setTodos([
-      ...todos,
-      {
-        ...newTodo,
-        id,
-      },
-    ]);
-
-    setNewTodo({ text: "", isDone: false });
-    setSavingCount((savingCount) => --savingCount);
+      setNewTodo({ text: "", isDone: false });
+      setSavingCount((savingCount) => --savingCount);
+    }
   };
 
   function handleChange(event) {
@@ -50,13 +51,13 @@ export default function Home() {
     };
     setTodos(newTodos);
   }
+
   function handleDelete(id) {
     const newTodos = [...todos];
     newTodos.splice(newTodos.indexOf(todos.find((todo) => todo.id === id)), 1);
     setTodos(newTodos);
   }
 
-  console.log(todos);
   return (
     <div className="bg-gray-100 flex justify-center align-middle h-screen">
       <div className="bg-white rounded-md shadow-lg m-auto w-1/4 overflow-hidden">
@@ -116,40 +117,38 @@ export default function Home() {
             {todos.length > 0 ? (
               <ul className="">
                 {todos.map((todo) => (
-                  <>
-                    <li
-                      key={todo.id}
-                      className={
-                        "flex items-center " +
-                        (todo.completed ? "line-through" : "")
-                      }
+                  <li
+                    key={todo.id}
+                    className={
+                      "flex items-center " +
+                      (todo.completed ? "line-through" : "")
+                    }
+                  >
+                    <input
+                      type="checkbox"
+                      checked={todo.completed}
+                      onChange={() => handleCheck(todo.id)}
+                      className="mr-2"
+                    />
+                    <span>{todo.text}</span>
+                    <button
+                      className="ml-3 text-yellow-500"
+                      onClick={() => handleDelete(todo.id)}
                     >
-                      <input
-                        type="checkbox"
-                        checked={todo.completed}
-                        onChange={() => handleCheck(todo.id)}
-                        className="mr-2"
-                      />
-                      <span>{todo.text}</span>
-                      <button
-                        className="ml-3 text-yellow-500"
-                        onClick={() => handleDelete(todo.id)}
+                      <svg
+                        className="w-6 h-6"
+                        fill="currentColor"
+                        viewBox="0 0 20 20"
+                        xmlns="http://www.w3.org/2000/svg"
                       >
-                        <svg
-                          className="w-6 h-6"
-                          fill="currentColor"
-                          viewBox="0 0 20 20"
-                          xmlns="http://www.w3.org/2000/svg"
-                        >
-                          <path
-                            fillRule="evenodd"
-                            d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z"
-                            clipRule="evenodd"
-                          />
-                        </svg>
-                      </button>
-                    </li>
-                  </>
+                        <path
+                          fillRule="evenodd"
+                          d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z"
+                          clipRule="evenodd"
+                        />
+                      </svg>
+                    </button>
+                  </li>
                 ))}
               </ul>
             ) : (
